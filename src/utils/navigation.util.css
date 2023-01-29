@@ -1,0 +1,14 @@
+.nav-link {
+  color: black;
+  font-weight: bold;
+}
+
+.nav-link:hover, .active{
+    color: rebeccapurple;
+    font-weight: bold;
+}
+
+.active{
+    color: red;
+    font-weight: bold;
+}
