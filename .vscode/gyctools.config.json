@@ -1,0 +1,103 @@
+{
+    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v1.json",
+    "projectName": "gyctoolsdemo",
+    "projectPath": "gyctoolsdemo",
+    "enabled": true,    
+    "openFileWhenComplete": false,
+    "templatePath":"",
+    "overrideExists":true,
+    "dataBaseList": [
+        {
+            "dataBaseName": "gyc_tools",
+            "tableNamePrefix": "TB_",
+            "templateList": [
+                {
+                    "templateName": "/java/object.njk",
+                    "outFileType": ".java",
+                    "outPath": "/gyctoolsdemo/java/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "/java/mybatis_dao.njk",
+                    "outFileType": "DAO.java",
+                    "outPath": "/gyctoolsdemo/java/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "/java/mybatis_dao_map.njk",
+                    "outFileType": ".xml",
+                    "outPath": "/gyctoolsdemo/resources/mybatis/",
+                    "enabled": true,
+                    "language":"java"
+                },
+                {
+                    "templateName": "/typescript/interface.njk",
+                    "outFileType": ".ts",
+                    "outPath": "/gyctoolsdemo/typescript/",
+                    "enabled": true,
+                    "customsTypeInterpreterConfig": {
+                        "int": {
+                            "result": "number"
+                        },
+                        "another_ts_db_type": {
+                            "result": "your_language_ts_type_name",
+                            "importTypeName": "import {vscode} from 'vscode'"
+                        },
+                        "default": {
+                            "result": "string"
+                        }
+                    }
+                },
+                {
+                    "templateName": "/csharp/object.njk",
+                    "outFileType": ".cs",
+                    "outPath": "/gyctoolsdemo/csharp/",
+                    "enabled": true,
+                    "customsTypeInterpreterConfig": {
+                        "int": {
+                            "result": "Int32",
+                            "importTypeName": "System"
+                        },
+                        "datetime": {
+                            "result": "Date",
+                            "importTypeName": "System"
+                        },
+                        "another_ts_db_type": {
+                            "result": "your_language_ts_type_name",
+                            "importTypeName": "System.Date"
+                        },
+                        "default": {
+                            "result": "String",
+                            "importTypeName": "System"
+                        }
+                    }
+                }
+            ],
+            "customsAttributes": {
+                "author": "leechzhao3@hotmail.com",
+                "modelPackageName": "com.sqg.model",
+                "readerPackageName": "com.sqg.reader",
+                "writerPackageName": "com.sqg.writer",
+                "servicePackageName": "com.sqg.service",
+                "serviceImplPackageName": "com.sqg.service.impl",
+                "cSharpObjectNameSpace": "gyctools"
+            },
+            "customsTypeInterpreterConfig": {
+                "another_db_type": {
+                    "result": "your_language_type_name",
+                    "importTypeName": "import {vscode} from 'vscode'"
+                },
+                "default": {
+                    "result": "string"
+                }
+            }
+        }
+    ],
+    "baseModelProperties": [
+        "id",
+        "dr",
+        "dataVersion",
+        "createTime",
+        "updateTime"
+    ]
+}

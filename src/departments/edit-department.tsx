@@ -1,25 +1,30 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState} from 'react';
 import { DepartmentForm } from "../forms/departments/department.form";
 import { CreateDepartmentDto as Department } from "../models/departments/create-department.model";
 import { useNavigate, useParams } from "react-router-dom";
 import Axios from "../utils/axios-jwt-token.util";
-import { AuthContext } from "../store/auth-context.store";
 import { UserType } from '../models/user-type';
+import { AuthUser } from '../models/store/auth-user.model';
+import { AuthUserRxJs } from '../store/auth-rxjs.store';
 
 const departmentInitial: Department = {
   name: "",
 };
 
-export const EditDepartment = () => {  
+export const EditDepartment = () => { 
+  const [authUser, setAuthUser] = useState({} as AuthUser); 
   const [department, setDepartment] = useState(departmentInitial);
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate();
   const {id} = useParams();
-  const authContext = useContext(AuthContext);
 
   const url = `departments/${id}`;
 
   console.log({url})
+
+  useEffect(() => {
+    AuthUserRxJs.authUser$.subscribe(setAuthUser);    
+  },[]);
 
   useEffect(() => {    
     const getDepartment = async () => {
@@ -47,7 +52,7 @@ export const EditDepartment = () => {
 
   return (
     <>
-      {!isLoading && authContext?.authUser?.userType === UserType.Admin ? (
+      {!isLoading && authUser?.userType === UserType.Admin ? (
         <DepartmentForm
           departmentInitial={department}
           backToListHandler={backToListHandler}

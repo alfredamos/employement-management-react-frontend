@@ -6,4 +6,5 @@ export interface AuthUser{
     name?: string;
     userType?: UserType;
     isLoggedIn: boolean;
+    token?: string;
 }

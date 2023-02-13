@@ -1,15 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { EmployeeListDto as Employee } from "../models/employees/employee-list.model";
 import { UserType } from "../models/user-type";
-import { AuthContext } from "../store/auth-context.store";
-import { useContext } from "react";
+import { useState, useEffect } from "react";
+import { AuthUserRxJs } from '../store/auth-rxjs.store';
 
 interface SingleEmployeeViewProp {
   employee: Employee;
 }
 
 export const SingleEmployeeView = ({ employee }: SingleEmployeeViewProp) => {
-  const authContext = useContext(AuthContext);
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    AuthUserRxJs.authUser$.subscribe(authUser => {
+      const isAnAdmin = authUser.userType === UserType.Admin;
+      setIsAdmin(isAnAdmin);
+    });
+  },[]);
+
+  const deleteEmployeeHandler = (id: string) => {
+    navigate(`/delete-employee/${id}`);
+  }
 
   return (
     <>
@@ -27,14 +40,14 @@ export const SingleEmployeeView = ({ employee }: SingleEmployeeViewProp) => {
       <td>{employee.dateOfBirth?.toString()?.substring(0, 10)}</td>
       <td>{employee.department?.name}</td>
       <>
-        {authContext?.authUser?.userType === UserType.Admin && (
-          <td>
-            <Link
+        {isAdmin && (
+          <td>           
+            <button
               className="btn btn-outline-danger m-1"
-              to={`/delete-employee/${employee?.id}`}
+              onClick={() => deleteEmployeeHandler(employee.id)}
             >
               Delete
-            </Link>
+            </button>
           </td>
         )}
       </>

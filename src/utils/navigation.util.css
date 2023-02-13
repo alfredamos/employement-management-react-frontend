@@ -1,9 +1,9 @@
-.nav-link {
+.nav-link, .btn-link {
   color: black;
   font-weight: bold;
 }
 
-.nav-link:hover, .active{
+.nav-link:hover, .btn-link:hover{
     color: rebeccapurple;
     font-weight: bold;
 }

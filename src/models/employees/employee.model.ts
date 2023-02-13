@@ -2,7 +2,7 @@ import { DepartmentDto as Department } from "../departments/department.model";
 import { Gender } from "../gender";
 import { UserType } from "../user-type";
 
-export interface Employee {
+export interface EmployeeDto {
   id?: string;
   fullName: string;
   email: string;

@@ -1,5 +1,6 @@
 import { DepartmentDto as Department} from "../departments/department.model";
 import { Gender } from "../gender";
+import { UserType } from "../user-type";
 
 export interface EditEmployeeProfileDto {
   id:string;
@@ -10,6 +11,7 @@ export interface EditEmployeeProfileDto {
   gender: Gender;
   password: string;  
   newPassword: string;  
-  departmentId: string;
-  department?: Department
+  departmentId?: string;
+  department?: Department;
+  userType?: UserType;
 }

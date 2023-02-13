@@ -1,16 +1,20 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect} from "react";
 import { DepartmentDto } from "../models/departments/department.model";
 import Axios from "../utils/axios-jwt-token.util";
-import { AuthContext } from "../store/auth-context.store";
 import { Link, useNavigate } from "react-router-dom";
 import { UserType } from "../models/user-type";
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
+import { AuthUser } from "../models/store/auth-user.model";
 
 export const DepartmentList = () => {
   const [departments, setDepartments] = useState([] as DepartmentDto[]);
+  const [authUser, setAuthUser] = useState({} as AuthUser);  
 
   const navigate = useNavigate();
 
-  const authContext = useContext(AuthContext);
+  useEffect(() => {
+    AuthUserRxJs.authUser$.subscribe(setAuthUser);
+  }, []);
 
   const departmentsUrl = "departments";
   const roles = ['Admin', 'Management', 'Staff'];
@@ -29,6 +33,19 @@ export const DepartmentList = () => {
     navigate("/create-department");
   };
 
+  const deleteDepartmentHandler = (id: string) => {
+    console.log("in dept. list id : ", id);
+     navigate(`/delete-department/${id}`);
+  }
+
+  const editDepartmentHandler = (id: string) => {
+     navigate(`/edit-department/${id}`);
+  }
+
+  const isAdmin = () => {
+    return authUser.userType === UserType.Admin;
+  };
+
   const matchRoles = (roles: string[], userType: UserType) => {
     return roles.includes(userType);
   };
@@ -37,7 +54,7 @@ export const DepartmentList = () => {
     <div className="border" style={{ padding: "10px" }}>
       <div className="card">
         <>
-          {authContext?.authUser?.isLoggedIn && (
+          {authUser?.isLoggedIn && (
             <div className="card-header">
               <h4 className="text-center">List of Departments</h4>
             </div>
@@ -45,14 +62,14 @@ export const DepartmentList = () => {
         </>
         <div className="card-body">
           <>
-            {authContext?.authUser?.isLoggedIn &&
-            matchRoles(roles, authContext?.authUser.userType!) ? (
+            {authUser?.isLoggedIn &&
+            matchRoles(roles, authUser?.userType!) ? (
               <table className="table responsive striped bordered">
                 <thead>
                   <tr>
                     <th>Name</th>
                     <>
-                      {authContext?.authUser?.userType === UserType.Admin && (
+                      {isAdmin() && (
                         <th>Actions</th>
                       )}
                     </>
@@ -70,21 +87,25 @@ export const DepartmentList = () => {
                         </Link>
                       </td>
                       <>
-                        {authContext?.authUser?.userType === UserType.Admin && (
+                        {isAdmin() && (
                           <td>
-                            <Link
+                            <button
                               className="btn btn-outline-success m-1"
-                              to={`/edit-department/${department.id}`}
+                              onClick={() =>
+                                editDepartmentHandler(department.id)
+                              }
                             >
                               Edit
-                            </Link>
+                            </button>
 
-                            <Link
+                            <button
                               className="btn btn-outline-danger m-1"
-                              to={`/delete-department/${department.id}`}
+                              onClick={() =>
+                                deleteDepartmentHandler(department.id)
+                              }
                             >
                               Delete
-                            </Link>
+                            </button>
                           </td>
                         )}
                       </>
@@ -104,8 +125,8 @@ export const DepartmentList = () => {
         </div>
         <div className="card-footer">
           <>
-            {authContext?.authUser?.isLoggedIn &&
-              authContext?.authUser?.userType === UserType.Admin && (
+            {authUser?.isLoggedIn &&
+              isAdmin() && (
                 <button
                   className="btn btn-outline-secondary form-control"
                   type="button"

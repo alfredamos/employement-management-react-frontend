@@ -1,24 +1,28 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect} from "react";
 import { DeleteDepartmentDto as Department } from "../models/departments/delete-department.model";
 import Axios from "../utils/axios-jwt-token.util";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../store/auth-context.store";
 import { UserType } from "../models/user-type";
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
+import { AuthUser } from "../models/store/auth-user.model";
 
 const baseUrl = "departments";
 
 export const DepartmentDetail = () => {
+  const [authUser, setAuthUser] = useState({} as AuthUser);
   const [department, setDepartment] = useState({} as Department);
   const navigate = useNavigate();
   const { id } = useParams();
-  const authContext = useContext(AuthContext);
 
   const url = `${baseUrl}/${id}`;
   const roles = ['Admin', 'Management', 'Staff'];
 
   useEffect(() => {
+    AuthUserRxJs.authUser$.subscribe(setAuthUser);
+  },[]);
+
+  useEffect(() => {
     const getDepartment = async () => {
-      console.log({url});
       
       const response = await Axios.get(url);
       const data: Department = response.data;
@@ -43,8 +47,8 @@ export const DepartmentDetail = () => {
       className="border"
       style={{ margin: "50px auto", width: "75%", padding: "10px" }}
     >
-      {authContext?.authUser?.isLoggedIn &&
-      matchRoles(roles, authContext?.authUser.userType!) ? (
+      {authUser?.isLoggedIn &&
+      matchRoles(roles, authUser?.userType!) ? (
         <ul className="list-group">
           <li className="list-group-item">Name: {department.name}</li>
           <li className="list-group-item">

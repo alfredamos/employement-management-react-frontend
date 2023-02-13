@@ -2,17 +2,16 @@ import { useState, useEffect } from "react";
 import { EditEmployeeProfileDto as Employee } from "../models/auth/edit-employee-profile.model";
 import { DepartmentDto as Department } from "../models/departments/department.model";
 import Axios from "../utils/axios-jwt-token.util";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { EditEmployeeProfile } from "../forms/auth/employee-edit-profile.form";
 
 export const AuthEditProfile = () => {
-
   const [employee, setEmployee] = useState({} as Employee);
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState([] as Department[]);
 
   const navigate = useNavigate();
-  
+
   const url = "employees/current-user";
 
   const editEmployeeProfileUrl = "auth/edit-profile";
@@ -32,10 +31,10 @@ export const AuthEditProfile = () => {
     const getEmployee = async () => {
       const response = await Axios.get(url);
       const data: Employee = response.data;
-     
-      const employeeToEdit = getInitialEmployee(data)
-      
-      setEmployee(employeeToEdit);
+
+      const employeeToEdit = getInitialEmployee(data);
+
+      setEmployee(employeeToEdit!);
       setIsLoading(true);
     };
     getEmployee();
@@ -47,26 +46,26 @@ export const AuthEditProfile = () => {
   };
 
   const employeeEditProfileSubmit = async (editEmployeeProfile: Employee) => {
-    console.log({editEmployeeProfile});
-    
+    console.log({ editEmployeeProfile });
+
     const response = await Axios.patch(
       editEmployeeProfileUrl,
       editEmployeeProfile
     );
     const data: Employee = response.data;
     setEmployee(data);
-    navigate('/');
+    navigate("/");
   };
 
-  const getInitialEmployee = (employee: Employee) =>{
-        return {
-          ...employee,
-          dateOfBirth: employee.dateOfBirth.toString().substring(0, 10),
-          password: "",
-          newPassword: "",
-          departmentId: employee?.department!.id,
-        };
-  }
+  const getInitialEmployee = (employee: Employee) => {
+    return {
+      ...employee,
+      dateOfBirth: employee.dateOfBirth.toString().substring(0, 10),
+      password: "",
+      newPassword: "",
+      departmentId: employee?.department?.id,
+    };
+  };
 
   return (
     <>

@@ -1,21 +1,25 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect} from "react";
 import { EmployeeDelete as Employee } from "../models/employees/employee-delete";
 import Axios from "../utils/axios-jwt-token.util";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../store/auth-context.store";
 import { UserType } from "../models/user-type";
+import { AuthUser } from "../models/store/auth-user.model";
+import { AuthUserRxJs } from '../store/auth-rxjs.store';
 
 const baseUrl: string = "http://localhost:3100/api/employees";
 
 export const EmployeeDetail = () => {
+  const [authUser, setAuthUser] = useState({} as AuthUser)
   const [employee, setEmployee] = useState({} as Employee);
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const authContext = useContext(AuthContext);
-
   const url = `${baseUrl}/${id}`;
   const roles = ['Admin', 'Management', 'Staff'];
+
+  useEffect(() => {
+    AuthUserRxJs.authUser$.subscribe(setAuthUser);
+  },[]);
 
   useEffect(() => {
     const getEmployee = async () => {
@@ -45,8 +49,8 @@ export const EmployeeDetail = () => {
       className="border"
       style={{ margin: "50px auto", width: "75%", padding: "10px" }}
     >
-      {authContext?.authUser?.isLoggedIn &&
-      matchRoles(roles, authContext?.authUser.userType!) ? (
+      {authUser?.isLoggedIn &&
+      matchRoles(roles, authUser.userType!) ? (
         <ul className="list-group">
           <li className="list-group-item text-center">
             FullName: {employee?.fullName}
@@ -75,7 +79,7 @@ export const EmployeeDetail = () => {
               Back
             </button>
             <>
-              {authContext?.authUser?.userType === UserType.Admin && (
+              {authUser?.userType === UserType.Admin && (
                 <button
                   type="button"
                   onClick={() => deleteHandler(employee.id)}

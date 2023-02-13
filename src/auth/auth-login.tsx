@@ -1,10 +1,10 @@
-import { useState, useContext } from "react";
+import { useState} from "react";
 import { EmployeeInfo } from "../models/employees/employee-info.model";
 import { EmployeeLogin } from "../forms/auth/employee-login.form";
 import { EmployeeLoginDto } from "../models/auth/employee-login.model";
 import { useNavigate } from "react-router-dom";
 import Axios from "../utils/axios-jwt-token.util";
-import { AuthContext } from "../store/auth-context.store";
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
 
 const initialEmployee: EmployeeLoginDto = {
   email: "",
@@ -14,8 +14,6 @@ const initialEmployee: EmployeeLoginDto = {
 export const AuthLogin = () => {
   const [employee, setEmployee] = useState(initialEmployee);
   const navigate = useNavigate();
-
-  const authContext = useContext(AuthContext);
 
   const url = "auth/login";
 
@@ -30,12 +28,12 @@ export const AuthLogin = () => {
 
     const data: EmployeeInfo = response.data;
 
-    authContext.setAuthUser({
+    AuthUserRxJs.getAuthUser$({
       id: data.id,
       name: data.fullName,
       userType: data.userType,
       isLoggedIn: true,
-    });
+    });    
 
     localStorage.setItem("jwt", data.token);
     navigate("/");

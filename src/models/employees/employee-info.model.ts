@@ -6,5 +6,5 @@ export interface EmployeeInfo{
     message?: string;
     token: string;
     userType: UserType;
-
+    isLoggedIn?:boolean;
 }

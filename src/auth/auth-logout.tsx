@@ -1,96 +1,67 @@
-import { useContext } from "react";
-import { AuthContext } from "../store/auth-context.store";
-import { UserType } from "../models/user-type";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
 import "./auth-logout.css";
+import { Link, useNavigate } from "react-router-dom";
+import { DeleteItem } from "../utils/delete-item.util";
+import { UserType } from "../models/user-type";
 
 export const AuthLogout = () => {
-  const authContext = useContext(AuthContext);
+  const [logoOutMessage] = useState(`Do you want to logout?`);
+  const [logoOutTitle] = useState("Logout confirmation!");
+  const [showDeleteItem, setShowDeleteItem] = useState(true);
+
   const navigate = useNavigate();
 
-  const logoutHandler = () => {
-    localStorage.setItem("jwt", JSON.stringify(""));
-    authContext.setAuthUser({
-      id: "",
-      name: "",
-      userType: UserType.Staff,
-      isLoggedIn: false,
-    });
-  };
-
-  const loginHandler = () => {
-    navigate("/login");
-  };
-
-  const signupHandler = () => {
-    navigate("/signup");
+  const logoutHandler = (value: boolean) => {
+    if (value) {     
+      AuthUserRxJs.getAuthUser$({
+        id: "",
+        name: "",
+        userType: UserType.Staff,
+        token: "",
+        isLoggedIn: false,
+      });
+      localStorage.setItem("jwt", "");
+      setShowDeleteItem(!showDeleteItem);
+    } else {
+      navigate("/");
+    }
   };
 
   return (
     <>
-      <div
-        className="border"
-        style={{
-          height: "80vh",
-          width: "50%",
-          margin: "auto",
-          padding: "10px",
-        }}
-      >
-        <div className="card" style={{ height: "76vh" }}>
-          <>
-            {!authContext.authUser.isLoggedIn && (
+      {!showDeleteItem ? (
+        <div className="border pado">
+          <div className="card wita">
+            <h4 className="text-center moba">
+              <hr />
+              You have successfully logged out!
+              <hr />
               <>
-                <div className="card-header">
-                  <h4 className="text-center">Log out Confirmation!</h4>
-                </div>
-                <div className="card-body">
-                  <h4 className="text-center text-align">
-                    You have logged out successfully!
-                  </h4>
-                </div>
-                <div className="card-footer">
-                  <button
-                    className="btn btn-outline-primary form-control m-1"
-                    onClick={loginHandler}
-                  >
-                    Login
-                  </button>
-                  <button
-                    className="btn btn-outline-secondary form-control m-1"
-                    onClick={signupHandler}
-                  >
-                    Signup
-                  </button>
-                </div>
+                <Link className="rd-text" to="/login">
+                  Do you have an account? Please log in!
+                </Link>
               </>
-            )}
-          </>
-          <>
-            {authContext.authUser.isLoggedIn && (
+              <hr />
               <>
-                <div className="card-header">
-                  <h4 className="text-center">Do you want to Log out?</h4>
-                </div>
-                <div className="card-body">
-                  <h4 className="text-center">
-                    Click the button below to log out!
-                  </h4>
-                </div>
-                <div className="card-footer">
-                  <button
-                    type="button"
-                    className="btn btn-outline-dark form-control"
-                    onClick={logoutHandler}
-                  >
-                    Log Out
-                  </button>
-                </div>
+                <Link className="rd-text" to="/signup">
+                  You don't have an account? Please signup!
+                </Link>
               </>
-            )}
-          </>
+              <hr />
+            </h4>
+          </div>
         </div>
-      </div>
+      ) : (
+        <DeleteItem
+          deleteItem={logoutHandler}
+          deleteMessage={logoOutMessage}
+          deleteTitle={logoOutTitle}
+          cancelButton="Back"
+          submitButton="Logout"
+          showDeleteItem={showDeleteItem}
+        />
+      )}
     </>
   );
 };

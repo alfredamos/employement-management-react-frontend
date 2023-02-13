@@ -1,20 +1,25 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect} from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Axios from "../utils/axios-jwt-token.util";
 import { EmployeeListDto as Employee } from "../models/employees/employee-list.model";
 import { SingleEmployeeView } from "./single-employee-view";
-import { AuthContext } from "../store/auth-context.store";
 import { UserType } from "../models/user-type";
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
+import { AuthUser } from "../models/store/auth-user.model";
 
 export const EmployeeList = () => {
   const [employees, setEmployees] = useState([] as Employee[]);
-
-  const authContext = useContext(AuthContext);
+  const [authUser, setAuthUser] = useState({} as AuthUser)
+  
 
   const navigate = useNavigate();
 
   const url = "employees";
   const roles = ["Admin", "Management", "Staff"];
+
+  useEffect(() => {
+    AuthUserRxJs.authUser$.subscribe(setAuthUser);
+  }, []);
 
   useEffect(() => {
     const getEmployees = async () => {
@@ -35,6 +40,10 @@ export const EmployeeList = () => {
     navigate("/signup");
   };
 
+  const isAdmin =() => {
+    return authUser.userType === UserType.Admin;
+  }
+
   const matchRoles = (roles: string[], userType: UserType) => {
     return roles.includes(userType);
   };
@@ -43,7 +52,7 @@ export const EmployeeList = () => {
     <div className="border" style={{ padding: "10px" }}>
       <div className="card">
         <>
-          {authContext?.authUser?.isLoggedIn && (
+          {authUser?.isLoggedIn && (
             <div className="card-header">
               <h4 className="text-center">List of Employees</h4>
             </div>
@@ -51,8 +60,8 @@ export const EmployeeList = () => {
         </>
         <div className="card-body">
           <>
-            {authContext?.authUser?.isLoggedIn &&
-            matchRoles(roles, authContext?.authUser.userType!) ? (
+            {authUser?.isLoggedIn &&
+            matchRoles(roles, authUser.userType!) ? (
               <table className="table table-responsive table-striped table-border">
                 <thead>
                   <tr>
@@ -63,7 +72,7 @@ export const EmployeeList = () => {
                     <th>Birth Date</th>
                     <th>Department</th>
                     <>
-                      {authContext?.authUser?.userType === UserType.Admin && (
+                      {isAdmin() && (
                         <th>Actions</th>
                       )}
                     </>
@@ -89,10 +98,10 @@ export const EmployeeList = () => {
           </>
         </div>
         <>
-          {authContext?.authUser?.userType === UserType.Admin && (
+          {isAdmin() && (
             <div className="card-footer">
               <>
-                {authContext?.authUser?.isLoggedIn && (
+                {authUser?.isLoggedIn && (
                   <button
                     className="btn btn-outline-secondary form-control"
                     type="button"

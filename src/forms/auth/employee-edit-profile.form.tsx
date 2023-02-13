@@ -145,6 +145,22 @@ export const EditEmployeeProfile = (props: EditEmployeeProfileProp) => {
               </select>
             </div>
             <div className="mb-3">
+              <label className="form-label" id="userType" htmlFor="userType">
+                User Type
+              </label>
+              <select
+              disabled
+                name="userType"
+                id="userType"
+                className="form-select"
+                value={employee.userType}
+                onChange={inputSelectChangeHandler}
+              >
+                <option value="Admin">Admin</option>
+                <option value="Staff">Staff</option>
+              </select>
+            </div>
+            <div className="mb-3">
               <label
                 className="form-label"
                 id="departmentId"
