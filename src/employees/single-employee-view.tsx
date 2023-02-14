@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { EmployeeListDto as Employee } from "../models/employees/employee-list.model";
+import { EmployeeDto as Employee } from "../models/employees/employee.model";
 import { UserType } from "../models/user-type";
 import { useState, useEffect } from "react";
 import { AuthUserRxJs } from '../store/auth-rxjs.store';

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { EditEmployeeProfileDto as Employee } from "../models/auth/edit-employee-profile.model";
 import { DepartmentDto as Department } from "../models/departments/department.model";
-import Axios from "../utils/axios-jwt-token.util";
 import { useNavigate } from "react-router-dom";
 import { EditEmployeeProfile } from "../forms/auth/employee-edit-profile.form";
+import { authService } from "../services/auth.service";
+import { departmentService } from "../services/department.service";
 
 export const AuthEditProfile = () => {
   const [employee, setEmployee] = useState({} as Employee);
@@ -19,20 +20,18 @@ export const AuthEditProfile = () => {
   const departmentUrl = "departments";
 
   useEffect(() => {
-    const getDepartment = async () => {
-      const response = await Axios.get(departmentUrl);
-      const data: Department[] = response.data;
+    const getDepartment = async () => {      
+      const data = await departmentService.findAll(departmentUrl);
       setDepartments(data);
     };
     getDepartment();
   }, []);
 
   useEffect(() => {
-    const getEmployee = async () => {
-      const response = await Axios.get(url);
-      const data: Employee = response.data;
-
-      const employeeToEdit = getInitialEmployee(data);
+    const getEmployee = async () => {      
+      const data = await authService.findOne(url);
+      
+      const employeeToEdit = getInitialEmployee(data as Employee);
 
       setEmployee(employeeToEdit!);
       setIsLoading(true);
@@ -46,14 +45,12 @@ export const AuthEditProfile = () => {
   };
 
   const employeeEditProfileSubmit = async (editEmployeeProfile: Employee) => {
-    console.log({ editEmployeeProfile });
-
-    const response = await Axios.patch(
-      editEmployeeProfileUrl,
-      editEmployeeProfile
+    console.log({ editEmployeeProfile });    
+    const data = await authService.edit(
+      editEmployeeProfile,
+      editEmployeeProfileUrl
     );
-    const data: Employee = response.data;
-    setEmployee(data);
+    setEmployee(data as Employee);
     navigate("/");
   };
 

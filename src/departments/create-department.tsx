@@ -1,22 +1,27 @@
-import { useState, useContext } from "react";
+import { useState} from "react";
 import { DepartmentForm } from "../forms/departments/department.form";
-import { CreateDepartmentDto as Department } from "../models/departments/create-department.model";
+import { DepartmentDto as Department } from "../models/departments/department.model";
 import { useNavigate } from "react-router-dom";
-import Axios from "../utils/axios-jwt-token.util";
-import { AuthContext } from "../store/auth-context.store";
 import { UserType } from "../models/user-type";
+import {departmentService} from "../services/department.service";
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
+import { AuthUser } from "../models/store/auth-user.model";
+import { useObservable } from "../utils/use-observable.util";
 
 const departmentInitial: Department = {
+  id: "" as string,
   name: "",
 };
 
-export const CreateDepartment = () => {
-  //departmentInitial, backToListHandler, onDepartmentSubmit
+export const CreateDepartment = () => {  
+  const authUser = useObservable<AuthUser>(
+    AuthUserRxJs.authUser$,
+    {} as AuthUser
+  );
   const [department, setDepartment] = useState(departmentInitial);
   const navigate = useNavigate();
-  const authContext = useContext(AuthContext);
 
-  const url = "departments";
+  const url = "departments"; 
 
   const backToListHandler = () => {
     navigate("/departments");
@@ -24,17 +29,20 @@ export const CreateDepartment = () => {
 
   const departmentSubmitHandler = async (departmentInput: Department) => {
     console.log("departmentInput : ", departmentInput);
-    const response = await Axios.post(url, departmentInput);
-    const data: Department = response.data;
+    const data = await departmentService.create(departmentInput, url);
 
     setDepartment(data);
 
     navigate("/departments");
   };
 
+  const isAdmin = () => {
+    return authUser?.userType === UserType.Admin;
+  }
+
   return (
     <>
-      {authContext?.authUser?.userType === UserType.Admin ? (
+      {isAdmin() ? (
         <DepartmentForm
           departmentInitial={department}
           backToListHandler={backToListHandler}

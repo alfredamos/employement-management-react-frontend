@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import Axios from "../utils/axios-jwt-token.util";
 import { useNavigate } from "react-router-dom";
 import { EmployeeChangePassword } from "../forms/auth/employee-change-password.form";
-import { EmployeeChangePasswordDto } from "../models/auth/employee-change-password.model";
-import { EmployeeInfo } from "../models/employees/employee-info.model";
+import { EmployeeChangePasswordDto } from '../models/auth/employee-change-password.model';
+import { authService } from "../services/auth.service";
 
 const initialEmployee: EmployeeChangePasswordDto = {
   email: "",
@@ -29,10 +28,9 @@ export const AuthChangePassword = () => {
 
   useEffect(() => {
     const getEmployeeProfile = async () => {
-      try {
-        const data = await Axios.get(currentEmployeeUrl);
-        const response: EmployeeInfo = data.data;
-        console.log({ response });
+      try {        
+        const data = await authService.findOne(currentEmployeeUrl);
+        console.log({ data });
         
       } catch (err: any) {
         console.log(err);
@@ -45,15 +43,15 @@ export const AuthChangePassword = () => {
 
   const employeeChangePasswordSubmit = async (
     employeeChangePassword: EmployeeChangePasswordDto
-  ) => {
-    const response = await Axios.patch(
-      changePasswordUrl,
-      employeeChangePassword
+  ) => {    
+    const data = await authService.edit(
+      employeeChangePassword,
+      changePasswordUrl
     );
-    const data: EmployeeChangePasswordDto = response.data;
+    //const data: EmployeeChangePasswordDto = response.data;
     console.log({ data });
 
-    setEmployeeChangePassword(data);
+    setEmployeeChangePassword(data as EmployeeChangePasswordDto);
     navigate("/");
   };
 

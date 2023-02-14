@@ -1,15 +1,14 @@
 import { Link, NavLink } from "react-router-dom";
-import { useState, useEffect} from "react";
 import "./navigation.util.css";
 import { AuthUserRxJs } from "../store/auth-rxjs.store";
 import { AuthUser } from "../models/store/auth-user.model";
+import { useObservable } from './use-observable.util';
 
 export const NavigationBar = () => {
-  const [authUser, setIsAuthUser] = useState({} as AuthUser)
-  
-  useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(setIsAuthUser);
-  }, []);
+  const authUser = useObservable(
+    AuthUserRxJs.authUser$,
+    {} as AuthUser
+  );  
 
   console.log("In NavBar at point 1, authUser : ", authUser?.isLoggedIn);
     

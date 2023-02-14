@@ -1,15 +1,16 @@
 import { useState, useEffect} from "react";
-import { EmployeeDelete as Employee } from "../models/employees/employee-delete";
-import Axios from "../utils/axios-jwt-token.util";
+import { EmployeeDto as Employee } from "../models/employees/employee.model";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserType } from "../models/user-type";
 import { AuthUser } from "../models/store/auth-user.model";
 import { AuthUserRxJs } from '../store/auth-rxjs.store';
+import { employeeService } from "../services/employee.service";
+import { useObservable } from '../utils/use-observable.util';
 
 const baseUrl: string = "http://localhost:3100/api/employees";
 
 export const EmployeeDetail = () => {
-  const [authUser, setAuthUser] = useState({} as AuthUser)
+  const authUser = useObservable(AuthUserRxJs.authUser$, {} as AuthUser);
   const [employee, setEmployee] = useState({} as Employee);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -18,13 +19,8 @@ export const EmployeeDetail = () => {
   const roles = ['Admin', 'Management', 'Staff'];
 
   useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(setAuthUser);
-  },[]);
-
-  useEffect(() => {
     const getEmployee = async () => {
-      const response = await Axios.get(url);
-      const data: Employee = response.data;
+      const data = await employeeService.findOne(url);
       setEmployee(data);
     };
 
@@ -32,12 +28,8 @@ export const EmployeeDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const backHandler = () => {
+  const backToListHandler = () => {
     navigate("/");
-  };
-
-  const deleteHandler = async (id: string) => {
-    navigate(`/delete-employee/${id}`);
   };
 
   const matchRoles = (roles: string[], userType: UserType) => {
@@ -73,22 +65,11 @@ export const EmployeeDetail = () => {
           <li className="list-group-item text-center">
             <button
               type="button"
-              onClick={backHandler}
+              onClick={backToListHandler}
               className="btn btn-outline-secondary form-control m-1"
             >
               Back
-            </button>
-            <>
-              {authUser?.userType === UserType.Admin && (
-                <button
-                  type="button"
-                  onClick={() => deleteHandler(employee.id)}
-                  className="btn btn-outline-danger form-control m-1"
-                >
-                  Delete
-                </button>
-              )}
-            </>
+            </button>           
           </li>
         </ul>
       ) : (

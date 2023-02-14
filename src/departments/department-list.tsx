@@ -1,29 +1,25 @@
 import { useState, useEffect} from "react";
 import { DepartmentDto } from "../models/departments/department.model";
-import Axios from "../utils/axios-jwt-token.util";
 import { Link, useNavigate } from "react-router-dom";
 import { UserType } from "../models/user-type";
 import { AuthUserRxJs } from "../store/auth-rxjs.store";
 import { AuthUser } from "../models/store/auth-user.model";
+import {departmentService} from "../services/department.service";
+import { useObservable } from '../utils/use-observable.util';
 
 export const DepartmentList = () => {
   const [departments, setDepartments] = useState([] as DepartmentDto[]);
-  const [authUser, setAuthUser] = useState({} as AuthUser);  
+  const authUser = useObservable(AuthUserRxJs.authUser$, {} as AuthUser);  
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(setAuthUser);
-  }, []);
 
   const departmentsUrl = "departments";
   const roles = ['Admin', 'Management', 'Staff'];
 
   useEffect(() => {
     const getAllDepartments = async () => {
-      const data = await Axios.get(departmentsUrl);
-      const response: DepartmentDto[] = data.data;
-      setDepartments(response);
+      const data = await departmentService.findAll(departmentsUrl);
+      setDepartments(data);
     };
 
     getAllDepartments();
@@ -92,7 +88,7 @@ export const DepartmentList = () => {
                             <button
                               className="btn btn-outline-success m-1"
                               onClick={() =>
-                                editDepartmentHandler(department.id)
+                                editDepartmentHandler(department?.id)
                               }
                             >
                               Edit

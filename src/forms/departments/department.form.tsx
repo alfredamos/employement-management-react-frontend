@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {EditDepartmentDto as Department} from "../../models/departments/edit-department.model"
+import {DepartmentDto as Department} from "../../models/departments/department.model"
 
 interface DepartmentProp {
   departmentInitial: Department;

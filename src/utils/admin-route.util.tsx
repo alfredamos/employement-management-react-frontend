@@ -7,7 +7,7 @@ interface AdminRouteProp{
 }
 
 export const AdminRoute = ({isAdmin, children}: AdminRouteProp) => {
-    if(!isAdmin)return <Navigate to="/home" replace/>
+    if(!isAdmin)return <Navigate to="/not-allowed" replace/>
     return (
         <>{children}</>
     );

@@ -3,7 +3,7 @@ import { Gender } from "../gender";
 import { UserType } from "../user-type";
 
 export interface EmployeeDto {
-  id?: string;
+  id: string;
   fullName: string;
   email: string;
   phone: string;

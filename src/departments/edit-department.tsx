@@ -1,18 +1,20 @@
 import { useEffect, useState} from 'react';
 import { DepartmentForm } from "../forms/departments/department.form";
-import { CreateDepartmentDto as Department } from "../models/departments/create-department.model";
+import { DepartmentDto as Department } from "../models/departments/department.model";
 import { useNavigate, useParams } from "react-router-dom";
-import Axios from "../utils/axios-jwt-token.util";
 import { UserType } from '../models/user-type';
 import { AuthUser } from '../models/store/auth-user.model';
 import { AuthUserRxJs } from '../store/auth-rxjs.store';
+import {departmentService} from "../services/department.service";
+import { useObservable } from '../utils/use-observable.util';
 
 const departmentInitial: Department = {
+  id: "",
   name: "",
 };
 
 export const EditDepartment = () => { 
-  const [authUser, setAuthUser] = useState({} as AuthUser); 
+  const authUser = useObservable(AuthUserRxJs.authUser$, {} as AuthUser); 
   const [department, setDepartment] = useState(departmentInitial);
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate();
@@ -22,14 +24,9 @@ export const EditDepartment = () => {
 
   console.log({url})
 
-  useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(setAuthUser);    
-  },[]);
-
   useEffect(() => {    
-    const getDepartment = async () => {
-      const response = await Axios.get(url);
-      const data: Department = response.data;
+    const getDepartment = async () => {     
+      const data = await departmentService.findOne(url);
       setIsLoading(false)
       setDepartment(data);
     };
@@ -43,8 +40,9 @@ export const EditDepartment = () => {
 
   const departmentSubmitHandler = async (departmentInput: Department) => {
     console.log("departmentInput : ", departmentInput);
-    const response = await Axios.patch(url, departmentInput);
-    const data: Department = response.data;
+    //const response = await Axios.patch(url, departmentInput);
+    //const data: Department = response.data;
+    const data = await departmentService.edit(departmentInput, url);
 
     setDepartment(data);
     navigate('/departments');

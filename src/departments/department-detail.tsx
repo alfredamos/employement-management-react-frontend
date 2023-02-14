@@ -1,15 +1,16 @@
 import { useState, useEffect} from "react";
 import { DeleteDepartmentDto as Department } from "../models/departments/delete-department.model";
-import Axios from "../utils/axios-jwt-token.util";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserType } from "../models/user-type";
 import { AuthUserRxJs } from "../store/auth-rxjs.store";
 import { AuthUser } from "../models/store/auth-user.model";
+import {departmentService} from "../services/department.service";
+import { useObservable } from '../utils/use-observable.util';
 
 const baseUrl = "departments";
 
 export const DepartmentDetail = () => {
-  const [authUser, setAuthUser] = useState({} as AuthUser);
+  const authUser = useObservable(AuthUserRxJs.authUser$, {} as AuthUser);
   const [department, setDepartment] = useState({} as Department);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -18,22 +19,14 @@ export const DepartmentDetail = () => {
   const roles = ['Admin', 'Management', 'Staff'];
 
   useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(setAuthUser);
-  },[]);
-
-  useEffect(() => {
-    const getDepartment = async () => {
-      
-      const response = await Axios.get(url);
-      const data: Department = response.data;
+    const getDepartment = async () => {    
+      const data = await departmentService.findOne(url);
       setDepartment(data);
     };
     getDepartment();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   
-
   const backHandler = () => {
     navigate("/departments");
   };

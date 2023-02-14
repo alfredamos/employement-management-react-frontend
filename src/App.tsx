@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Navigate,
   //  Navigate,
 } from "react-router-dom";
 import { EmployeeList } from "./employees/employee-list";
@@ -26,6 +27,7 @@ import { UserType } from "./models/user-type";
 import { Home } from "./utils/home.util";
 import { AuthUser } from "./models/store/auth-user.model";
 import { AuthUserRxJs } from "./store/auth-rxjs.store";
+import { NotAllowedPage } from "./utils/not-allowed-page.util";
 
 function App() {
   const [authUser, setAuthUser] = useState({} as AuthUser);
@@ -97,6 +99,7 @@ function App() {
         <Route path="/logout" element={<AuthLogout />}></Route>
         <Route path="/signup" element={<AuthSignup />}></Route>
         <Route path="/home" element={<Home />}></Route>
+        <Route path="/not-allowed" element={<NotAllowedPage />}></Route>
         <Route
           path="/"
           element={
@@ -121,7 +124,7 @@ function App() {
             </LoginRoute>
           }
         ></Route>
-        {/* <Route path="*" element={<Navigate to="/home" replace/>}></Route> */}
+        <Route path="*" element={<Navigate to="/home" replace/>}></Route> 
       </Routes>
     </Router>
   );

@@ -1,16 +1,17 @@
-import { useState, useEffect} from "react";
-import { EmployeeDto as Employee} from "../models/employees/employee.model";
-import Axios from "../utils/axios-jwt-token.util";
+import { useState, useEffect } from "react";
+import { EmployeeDto as Employee } from "../models/employees/employee.model";
 import { useNavigate, useParams } from "react-router-dom";
 import { DeleteItem } from "../utils/delete-item.util";
 import { DisplayDeleteItem } from "./display-delete-item";
-import { AuthUserRxJs } from '../store/auth-rxjs.store';
+import { AuthUserRxJs } from "../store/auth-rxjs.store";
 import { AuthUser } from "../models/store/auth-user.model";
+import { employeeService } from "../services/employee.service";
+import { useObservable } from '../utils/use-observable.util';
 
 const baseUrl: string = "http://localhost:3100/api/employees";
 
 export const DeleteEmployee = () => {
-  const [authUser, setAuthUser] = useState({} as AuthUser);
+  const authUser = useObservable(AuthUserRxJs.authUser$, {} as AuthUser);
   const [employee, setEmployee] = useState({} as Employee);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [deleteTitle, setDeleteTitle] = useState("");
@@ -18,32 +19,30 @@ export const DeleteEmployee = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
-  const {id} =  useParams();  
+  const { id } = useParams();
 
   const url = `${baseUrl}/${id}`;
 
-  useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(setAuthUser);
-  },[]);
-
-  useEffect(() => {
+  useEffect(() => {    
     const getEmployee = async () => {
-      const response = await Axios.get(url);
-      const data: Employee = response.data;
+      const data = await employeeService.findOne(url);
+      console.log("employee : ", data);
       setEmployee(data);
       setIsLoading(false);
     };
+
     getEmployee();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const backToListHandler = () => {
-    navigate("/employees");
+    navigate("/");
   };
 
   const deleteHandler = async (value: boolean) => {
     if (value) {
-      await Axios.delete(url);
+      await employeeService.delete(url);
       navigate("/");
     } else {
       navigate("/");

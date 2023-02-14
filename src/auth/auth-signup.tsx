@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Axios from "../utils/axios-jwt-token.util";
 import { EmployeeSignupDto } from "../models/auth/employee-signup.model";
 import { EmployeeSignup } from "../forms/auth/employee-signup.form";
 import { DepartmentDto as Department } from "../models/departments/department.model";
 import { Gender } from "../models/gender";
+import { departmentService } from "../services/department.service";
+import { authService } from "../services/auth.service";
 
 const initialEmployee: EmployeeSignupDto = {
   fullName: "",
@@ -28,8 +29,7 @@ export const AuthSignup = () => {
 
   useEffect(() => {
     const getDepartment = async () => {
-      const response = await Axios.get(departmentUrl);
-      const data: Department[] = response.data;
+      const data = await departmentService.findAll(departmentUrl);
       setDepartments(data);
       setIsLoading(true);
     };
@@ -42,9 +42,8 @@ export const AuthSignup = () => {
 
   const employeeSignupSubmit = async (signupInput: EmployeeSignupDto) => {
     console.log({ signupInput });
-    const response = await Axios.post(signupUrl, signupInput);
-    const data: EmployeeSignupDto = response.data;
-    setEmployee(data);
+    const data = await authService.create(signupInput, signupUrl);
+    setEmployee(data as EmployeeSignupDto);
     console.log({ data });
     navigate("/");
   };

@@ -1,16 +1,17 @@
 import { useState, useEffect} from "react";
 import { DeleteDepartmentDto as Department } from "../models/departments/delete-department.model";
-import Axios from "../utils/axios-jwt-token.util";
 import { useNavigate, useParams } from "react-router-dom";
 import { DeleteItem } from "../utils/delete-item.util";
 import {DisplayDeleteItem} from "./display-delete-item";
 import { AuthUserRxJs } from "../store/auth-rxjs.store";
 import { AuthUser } from "../models/store/auth-user.model";
+import {departmentService} from "../services/department.service";
+import { useObservable } from '../utils/use-observable.util';
 
 const baseUrl: string = "departments";
 
 export const DeleteDepartment = () => {
-  const [authUser, setAuthUser] = useState({} as AuthUser);
+  const authUser = useObservable(AuthUserRxJs.authUser$, {} as AuthUser);
   const [department, setDepartment] = useState({} as Department);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [deleteTitle, setDeleteTitle] = useState("");
@@ -23,18 +24,11 @@ export const DeleteDepartment = () => {
   const url = `${baseUrl}/${id}`;
 
   console.log("In delete, showDeleteItem :  ", showDeleteItem);
-  console.log("In delete, isLoading :  ", isLoading);
+  console.log("In delete, isLoading :  ", isLoading); 
 
   useEffect(() => {
-    AuthUserRxJs.authUser$.subscribe(authUser => {
-      setAuthUser(authUser);
-    })
-  })
-
-  useEffect(() => {
-    const getDepartment = async () => {
-      const response = await Axios.get(url);
-      const data: Department = response.data;
+    const getDepartment = async () => {      
+      const data = await departmentService.findOne(url);
       setDepartment(data);
       setIsLoading(false);
     };
@@ -48,7 +42,7 @@ export const DeleteDepartment = () => {
 
   const deleteHandler = async (value: boolean) => {
     if (value) {
-      await Axios.delete(url);
+      await departmentService.delete(url);
       navigate("/departments");
     } else {
       navigate("/departments");
